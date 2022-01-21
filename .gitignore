@@ -1,0 +1,28 @@
+# Django files
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+# Secure info
+/secrets.json
+
+# env, database, and text planning files
+.env
+db.sqlite3
+.txt
+
+# VSC files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
