@@ -1,0 +1,7 @@
+Models:
+- Model for reddit posts themselves
+- Model for top level comments of reddit posts.
+
+To use:
+- postgres (obv)
+- Bootstrap
