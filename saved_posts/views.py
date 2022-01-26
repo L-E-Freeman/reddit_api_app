@@ -1,20 +1,22 @@
-from email import header
 import requests
 import os
 import json
 from pathlib import Path
 import logging
+import praw
 
 from reddit_api_app.settings import get_secret
 
 from django.shortcuts import render
-from django.http import HttpResponse
+
+import saved_posts
 
 
 logger = logging.getLogger("myLogger")
     
-def authenticate(request):
-    """Initializing authentication attributes"""
+def authenticate_api(request):
+    """Initializing Reddit object with credentials and returning."""
+
     # Getting base directory path
     BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,38 +24,32 @@ def authenticate(request):
     with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
         secrets = json.load(secrets_file)
 
-    auth = requests.auth.HTTPBasicAuth(
-        get_secret("PERSONAL_USE_SCRIPT"), 
-        get_secret("SECRET_TOKEN"))
-    
-    data = {
-        'grant_type': 'password', 
-        'username': get_secret("REDDIT_USERNAME"),
-        'password': get_secret("REDDIT_PASSWORD")
-    }
+    reddit = praw.Reddit(
+        client_id=get_secret("PERSONAL_USE_SCRIPT"),
+        client_secret=get_secret("SECRET_TOKEN"),
+        password=get_secret("REDDIT_PASSWORD"),
+        user_agent="SuggestBotV1.0",
+        username=get_secret("REDDIT_USERNAME"),
+    )
 
-    headers = {'User-Agent':'SuggestBot:v1.0'}
+    return reddit
 
-    res = requests.post(
-        'https://www.reddit.com/api/v1/access_token', 
-        auth=auth, data=data, headers=headers)
+def get_saved_posts(request):
+    """Get saved posts from the user."""
+    reddit = authenticate_api(request)
 
-    TOKEN = res.json()['access_token']
-    
-    # ** used for dictionary unpacking. Creates new dictionary and unpacks
-    # all key value pairs into the new dictionary.
-    headers = {**headers, **{'Authorization': f"bearer {TOKEN}"}}
+    user_all_saved_posts = reddit.user.me().saved(limit=None)
 
-    return headers
+    suggestion_post_list = []
+    for item in user_all_saved_posts:
+        try:
+            if item.subreddit == 'MovieSuggestions' or (
+                item.subreddit == 'suggestmeabook'):
+                suggestion_post_list.append(item.title)
+        except AttributeError:
+            # Comment, not submission.
+            pass
 
-def show_data(request):
-    headers = authenticate(request)
-
-    res = requests.get(
-        "https://oauth.reddit.com/r/python/hot",
-        headers=headers)
-
-    return render(
-        request, 'saved_posts/show_data.html', 
-        {'data': res.json()})
-
+    return render(request, 'saved_posts/show_data.html', {
+        'data': suggestion_post_list
+        })
