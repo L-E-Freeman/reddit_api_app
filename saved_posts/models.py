@@ -1,7 +1,7 @@
 from django.db import models
 
 class SavedPost(models.Model):
-    post_title = models.CharField(max_length=150)
+    post_title = models.CharField(max_length=150, unique=True)
     number_upvotes = models.IntegerField()
     number_comments = models.IntegerField()
     post_link = models.URLField(max_length=200)
@@ -13,5 +13,5 @@ class TopLevelComment(models.Model):
     parent_post = models.ForeignKey(
         SavedPost, on_delete=models.CASCADE
     )
-    contents = models.TextField()
+    contents = models.TextField(unique=True)
     number_upvotes = models.IntegerField()

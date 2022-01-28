@@ -5,11 +5,10 @@ from pathlib import Path
 import logging
 import praw
 
+from saved_posts.models import SavedPost, TopLevelComment
 from reddit_api_app.settings import get_secret
 
 from django.shortcuts import render
-
-import saved_posts
 
 
 logger = logging.getLogger("myLogger")
@@ -40,16 +39,56 @@ def get_saved_posts(request):
 
     user_all_saved_posts = reddit.user.me().saved(limit=None)
 
-    suggestion_post_list = []
     for item in user_all_saved_posts:
         try:
             if item.subreddit == 'MovieSuggestions' or (
                 item.subreddit == 'suggestmeabook'):
-                suggestion_post_list.append(item.title)
+                # If saved post does not exist
+                if not SavedPost.objects.filter(post_title = item.title).exists():
+                    sp = SavedPost(
+                        post_title = item.title, 
+                        number_upvotes = item.score, 
+                        number_comments = item.num_comments,
+                        post_link = item.url
+                    )
+                    sp.save()
+                else:
+                    pass
         except AttributeError:
             # Comment, not submission.
             pass
 
-    return render(request, 'saved_posts/show_data.html', {
-        'data': suggestion_post_list
-        })
+def get_top_level_comments(request):
+
+    get_saved_posts(request)
+
+    reddit = authenticate_api(request)
+
+    all_posts = SavedPost.objects.all()
+
+    comment_list = []
+    # For each post, for each top level comment in particular post...
+    for post in all_posts:
+        # Create submission instance to get comments
+        submission = reddit.submission(url=post.post_link)
+        submission.comments.replace_more(limit=0)
+        # Check if post has correct number of comments attached
+        if post.toplevelcomment_set.all().count() != post.number_comments:
+            for comment in submission.comments:
+                if not TopLevelComment.objects.filter(contents = comment.body):
+                    tlc = TopLevelComment(
+                        parent_post = post,
+                        contents = comment.body, 
+                        number_upvotes = comment.score
+                    )
+                    tlc.save()
+                else:
+                    pass
+        else: 
+            pass
+
+
+    return render(
+        request, 
+        'saved_posts/show_data.html',
+        {'data': TopLevelComment.objects.all()})
