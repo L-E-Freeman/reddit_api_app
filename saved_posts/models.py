@@ -13,5 +13,5 @@ class TopLevelComment(models.Model):
     parent_post = models.ForeignKey(
         SavedPost, on_delete=models.CASCADE
     )
-    contents = models.TextField(unique=True)
+    contents = models.TextField()
     number_upvotes = models.IntegerField()

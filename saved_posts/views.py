@@ -1,3 +1,4 @@
+from urllib import request
 import requests
 import os
 import json
@@ -7,6 +8,7 @@ import praw
 
 from saved_posts.models import SavedPost, TopLevelComment
 from reddit_api_app.settings import get_secret
+from django.views.generic.list import ListView
 
 from django.shortcuts import render
 
@@ -34,7 +36,8 @@ def authenticate_api(request):
     return reddit
 
 def get_saved_posts(request):
-    """Get saved posts from the user."""
+    """Get saved posts from the authenticated user."""
+
     reddit = authenticate_api(request)
 
     user_all_saved_posts = reddit.user.me().saved(limit=None)
@@ -44,7 +47,8 @@ def get_saved_posts(request):
             if item.subreddit == 'MovieSuggestions' or (
                 item.subreddit == 'suggestmeabook'):
                 # If saved post does not exist
-                if not SavedPost.objects.filter(post_title = item.title).exists():
+                if not SavedPost.objects.filter(
+                    post_title = item.title).exists():
                     sp = SavedPost(
                         post_title = item.title, 
                         number_upvotes = item.score, 
@@ -59,15 +63,12 @@ def get_saved_posts(request):
             pass
 
 def get_top_level_comments(request):
+    """Get top level comments from each of the users saved posts."""
 
     get_saved_posts(request)
-
     reddit = authenticate_api(request)
-
     all_posts = SavedPost.objects.all()
 
-    comment_list = []
-    # For each post, for each top level comment in particular post...
     for post in all_posts:
         # Create submission instance to get comments
         submission = reddit.submission(url=post.post_link)
@@ -75,6 +76,7 @@ def get_top_level_comments(request):
         # Check if post has correct number of comments attached
         if post.toplevelcomment_set.all().count() != post.number_comments:
             for comment in submission.comments:
+                # If comment does not already exist, save comment, else pass.
                 if not TopLevelComment.objects.filter(contents = comment.body):
                     tlc = TopLevelComment(
                         parent_post = post,
@@ -87,8 +89,16 @@ def get_top_level_comments(request):
         else: 
             pass
 
+class IndexView(ListView):
+    """Returns index list of saved posts."""
 
-    return render(
-        request, 
-        'saved_posts/show_data.html',
-        {'data': TopLevelComment.objects.all()})
+    # Update post list.
+    get_saved_posts(request)
+
+    model = SavedPost
+    template_name = 'saved_posts/index.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return SavedPost.objects.all()
+    
