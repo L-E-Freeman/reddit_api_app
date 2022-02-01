@@ -1,0 +1,10 @@
+{% extends 'saved_posts/base.html' %}
+
+{% block content %}
+    <h1>{{post.post_title}}</h1>
+    <h2><a href="{{post.post_link}}">Link to post</a></h2>
+
+    {% for tlc in post.toplevelcomment_set.all %} 
+        <li>{{ tlc.contents }}</li>
+    {% endfor %}
+{% endblock content %}

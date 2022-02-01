@@ -1,5 +1,7 @@
+{% extends 'saved_posts/base.html' %}
+
 {% block content %}
     {% for post in posts %}
-        <li>{{post}}</li>
+        <li><a href="{{post.id}}/">{{post.post_title}}</a></li>
     {% endfor %}
 {% endblock content %}

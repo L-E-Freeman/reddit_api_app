@@ -8,7 +8,7 @@ import praw
 
 from saved_posts.models import SavedPost, TopLevelComment
 from reddit_api_app.settings import get_secret
-from django.views.generic.list import ListView
+from django.views import generic
 
 from django.shortcuts import render
 
@@ -89,11 +89,12 @@ def get_top_level_comments(request):
         else: 
             pass
 
-class IndexView(ListView):
-    """Returns index list of saved posts."""
+def update_post_list(request):
+    """Button checks for new saved posts and adds to index."""
+    pass
 
-    # Update post list.
-    get_saved_posts(request)
+class IndexView(generic.ListView):
+    """Returns index list of saved posts."""
 
     model = SavedPost
     template_name = 'saved_posts/index.html'
@@ -101,4 +102,11 @@ class IndexView(ListView):
 
     def get_queryset(self):
         return SavedPost.objects.all()
+    
+class DetailView(generic.DetailView):
+    """Displays top level comments from a single post."""
+    model = SavedPost
+    template_name = 'saved_posts/detail.html'
+    context_object_name = 'post'
+
     
