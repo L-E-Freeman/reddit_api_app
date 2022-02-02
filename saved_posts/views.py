@@ -76,7 +76,8 @@ def get_top_level_comments(request):
         # Check if post has correct number of comments attached
         if post.toplevelcomment_set.all().count() != post.number_comments:
             for comment in submission.comments:
-                # If comment does not already exist, save comment, else pass.
+                # If comment does not already exist, save comment, else do not
+                # add duplicate comment.
                 if not TopLevelComment.objects.filter(contents = comment.body):
                     tlc = TopLevelComment(
                         parent_post = post,

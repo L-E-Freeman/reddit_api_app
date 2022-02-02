@@ -1,6 +1,11 @@
 {% extends 'saved_posts/base.html' %}
 
 {% block content %}
+
+    <div>
+        
+    </div>
+
     {% for post in posts %}
         <li><a href="{{post.id}}/">{{post.post_title}}</a></li>
     {% endfor %}

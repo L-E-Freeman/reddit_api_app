@@ -1,10 +1,30 @@
 {% extends 'saved_posts/base.html' %}
 
 {% block content %}
-    <h1>{{post.post_title}}</h1>
-    <h2><a href="{{post.post_link}}">Link to post</a></h2>
+    <div class="bg-dark text-white">
+        <h1>{{post.post_title}}</h1>
+        <h2><a href="{{post.post_link}}">Link to post</a></h2>
 
-    {% for tlc in post.toplevelcomment_set.all %} 
-        <li>{{ tlc.contents }}</li>
-    {% endfor %}
+        
+        <table class="table table-bordered table-striped table-dark">
+            <tr>
+                <th onclick="sortTable(comment)">Comment</th>
+                <th onclick="sortTable(upvotes)">Number Upvotes</th>
+            </tr>
+            
+            {% for tlc in post.toplevelcomment_set.all %} 
+            <tr>
+                <td>
+                    {{tlc.contents}}
+                </td>
+
+                <td>
+                    {{tlc.number_upvotes}}
+                </td>
+            </tr>
+            {% endfor %}
+        
+        </table>
+    </div>
 {% endblock content %}
+
