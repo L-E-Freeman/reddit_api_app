@@ -110,4 +110,4 @@ class DetailView(generic.DetailView):
     template_name = 'saved_posts/detail.html'
     context_object_name = 'post'
 
-    
+   

@@ -1,30 +1,38 @@
 {% extends 'saved_posts/base.html' %}
 
-{% block content %}
-    <div class="bg-dark text-white">
-        <h1>{{post.post_title}}</h1>
-        <h2><a href="{{post.post_link}}">Link to post</a></h2>
+{% block js %}
+{% load static %}
+<script src="{% static 'saved_posts/sort_table.js' %}">async</script>
+{% endblock js %}
 
-        
-        <table class="table table-bordered table-striped table-dark">
-            <tr>
-                <th onclick="sortTable(comment)">Comment</th>
-                <th onclick="sortTable(upvotes)">Number Upvotes</th>
-            </tr>
-            
-            {% for tlc in post.toplevelcomment_set.all %} 
-            <tr>
-                <td>
+{% block content %}
+
+
+<h1>{{post.post_title}}</h1>
+<h2><a href="{{post.post_link}}">Link to post</a></h2>
+
+
+<table id="commenttable" class="table table-bordered table-striped table-dark">
+    <thead>
+        <tr>
+            <th>Comment</th>
+            <th onclick="sortTable()">Number Upvotes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tlc in post.toplevelcomment_set.all|dictsortreversed:"number_upvotes" %} 
+            <tr class="datarow">
+                <td class="comment">
                     {{tlc.contents}}
                 </td>
 
-                <td>
+                <td class="numberupvotes">
                     {{tlc.number_upvotes}}
                 </td>
             </tr>
-            {% endfor %}
-        
-        </table>
-    </div>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock content %}
 
