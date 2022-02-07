@@ -1,0 +1,20 @@
+#bootstrapoverrides .upvoteinput{
+    width: 75px;
+    background-color: #343a40;
+    color: white;
+    line-height: 29px;
+    border: none;
+    border: solid 1px;
+    border-radius: 2px;
+    border-color: #6c757d;
+}
+
+#bootstrapoverrides .upvoteinput:focus {
+    color:white;
+}
+
+#bootstrapoverrides #submitfilter {
+    margin-bottom: 5px;
+    line-height: 20px;
+    margin-left: 5px;
+}

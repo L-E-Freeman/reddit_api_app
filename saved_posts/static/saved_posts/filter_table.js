@@ -1,4 +1,4 @@
-function sortTable() {
+function filterTable() {
     var table = document.getElementById("commenttable");
 
     // statement 1 initializes the i and row variables 
