@@ -2,7 +2,7 @@
 
 {% block js %}
 {% load static %}
-<script src="{% static 'saved_posts/sort_table.js' %}">async</script>
+<script src="{% static 'saved_posts/filter_table.js' %}"defer></script>
 {% endblock js %}
 
 {% block CSS %}
@@ -15,8 +15,7 @@
 
 
 <div>
-    Filter comments below <input type="number" class="upvoteinput"></input> upvotes
-    <button class="btn btn-outline-secondary" id="submitfilter" type="button" value="filter_table">Go</button>
+    Filter comments below <input type="number" id="upvoteinput" oninput="filterTable()"></input> upvotes
 </div>
 
 

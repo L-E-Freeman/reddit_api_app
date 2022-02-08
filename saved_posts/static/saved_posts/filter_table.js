@@ -1,15 +1,19 @@
 function filterTable() {
-    var table = document.getElementById("commenttable");
+    var upvoteInput = document.getElementById("upvoteinput").value
+    table = document.getElementById("commenttable")
 
-    // statement 1 initializes the i and row variables 
-    // statement 2 defines the condition for executing the codeblock 
-    // statement 3 is executed every time the code block is executed 
-
-    // loop through rows 
-    for (var i = 1, row; row=table.rows[i]; i++) {
-        // loop through cells of upvote column */
-
-    
+    // Loop iterates over iterable objects, in this case 
+    // an HTMLCollection object table.rows - an array-like list of HTML 
+    // elements.
+    for (let row of table.rows) {
+        let numUpvotes = parseInt(row.cells[1].innerText);
+        if (numUpvotes < upvoteInput) {
+            // clears filtered rows
+            row.style.display = "none"
+        } else {
+            // resets list when input cleared.
+            row.style.display = "";
+        }
     }
-
 }
+

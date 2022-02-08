@@ -1,4 +1,4 @@
-#bootstrapoverrides .upvoteinput{
+#bootstrapoverrides #upvoteinput{
     width: 75px;
     background-color: #343a40;
     color: white;
@@ -9,7 +9,7 @@
     border-color: #6c757d;
 }
 
-#bootstrapoverrides .upvoteinput:focus {
+#bootstrapoverrides #upvoteinput:focus {
     color:white;
 }
 
