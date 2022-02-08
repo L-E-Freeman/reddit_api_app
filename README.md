@@ -9,7 +9,7 @@ to help match content with your tastes.
 This app, built with Django, accesses the Reddit API, collects my saved posts and the top-level comments from each, and displays them in the browser -
 avoiding time consuming manual filtering, and eliminating the clutter of unnecessary replies from legitimate suggestion comments. 
 
-** Project currently under construction **
+**Project currently under construction**
 
 ## Features ##
 * Authentication via the Reddit API using PRAW. 
