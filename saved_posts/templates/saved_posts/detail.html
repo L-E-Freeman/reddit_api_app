@@ -12,7 +12,7 @@
 {% block content %}
 <h1>{{post.post_title}}</h1>
 <h2><a href="{{post.post_link}}">Link to post</a></h2>
-
+<h2><a href="{% url 'index' %}">Back to index</a></h2>
 
 <div>
     Filter comments below <input type="number" id="upvoteinput" oninput="filterTable()"></input> upvotes

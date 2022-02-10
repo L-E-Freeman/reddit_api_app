@@ -1,5 +1,3 @@
-from urllib import request
-import requests
 import os
 import json
 from pathlib import Path
@@ -8,9 +6,11 @@ import praw
 
 from saved_posts.models import SavedPost, TopLevelComment
 from reddit_api_app.settings import get_secret
-from django.views import generic
 
+from django.views import generic
 from django.shortcuts import render
+from django.core import serializers
+from django.http import JsonResponse
 
 
 logger = logging.getLogger("myLogger")
@@ -65,7 +65,6 @@ def get_saved_posts(request):
 def get_top_level_comments(request):
     """Get top level comments from each of the users saved posts."""
 
-    get_saved_posts(request)
     reddit = authenticate_api(request)
     all_posts = SavedPost.objects.all()
 
@@ -110,4 +109,27 @@ class DetailView(generic.DetailView):
     template_name = 'saved_posts/detail.html'
     context_object_name = 'post'
 
+def return_new_posts(request): 
+    """
+    Compares queryset of posts - current vs updated. Adds information from new
+    posts to a dict and returns as JSON response.
+    """
+    # Get posts currently available, then update post objects to get the new 
+    # posts.
+    
+    # TODO: We should get a subset of the saved posts that we know a different, 
+    # so we don't have to loop through every objects comments.
+    current_posts = SavedPost.objects.all()
+    get_saved_posts(request)
+    get_top_level_comments(request)
+    new_posts = SavedPost.objects.all()
+
+    # Compare old vs new, add necessary info from new post objects to dict.
+    posts_to_add = {}
+    for post in new_posts:
+        if post not in current_posts:
+            posts_to_add['post_title'] = post.post_title
+            posts_to_add['post_id'] = post.post_id
+
+    return JsonResponse(posts_to_add)
    

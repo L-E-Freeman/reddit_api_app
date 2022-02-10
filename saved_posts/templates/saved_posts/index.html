@@ -1,9 +1,13 @@
 {% extends 'saved_posts/base.html' %}
 
-{% block content %}
+{% block js %}
+{% load static %}
+<script src="{% static 'saved_posts/refresh_index.js' %}"defer></script>
+{% endblock js %}
 
-    <div>
-        
+{% block content %}
+    <div class="refreshdiv">
+        <input type="button" id="refreshindex" value="Refresh list" onclick="refreshIndex()"></input>
     </div>
 
     {% for post in posts %}
