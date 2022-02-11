@@ -62,13 +62,30 @@ def get_saved_posts(request):
             # Comment, not submission.
             pass
 
-def get_top_level_comments(request):
+def compare_saved_posts(request):
+    """
+    Compare current post list with updated to check for posts
+    that might have been saved while app was running and returns them.
+    """
+
+    current_posts = SavedPost.objects.all()
+    get_saved_posts(request)
+    new_posts = SavedPost.objects.all()
+
+    updated_posts = []
+    for post in new_posts:
+        if post not in current_posts:
+            updated_posts.append(post)
+
+    return updated_posts
+
+def get_top_level_comments(request, posts):
     """Get top level comments from each of the users saved posts."""
 
     reddit = authenticate_api(request)
-    all_posts = SavedPost.objects.all()
+    posts = posts
 
-    for post in all_posts:
+    for post in posts:
         # Create submission instance to get comments
         submission = reddit.submission(url=post.post_link)
         submission.comments.replace_more(limit=0)
@@ -89,10 +106,6 @@ def get_top_level_comments(request):
         else: 
             pass
 
-def update_post_list(request):
-    """Button checks for new saved posts and adds to index."""
-    pass
-
 class IndexView(generic.ListView):
     """Returns index list of saved posts."""
 
@@ -112,24 +125,16 @@ class DetailView(generic.DetailView):
 def return_new_posts(request): 
     """
     Compares queryset of posts - current vs updated. Adds information from new
-    posts to a dict and returns as JSON response.
+    posts to a dict and returns as JSON response. Also triggers comment 
+    additions for updated posts.
     """
-    # Get posts currently available, then update post objects to get the new 
-    # posts.
-    
-    # TODO: We should get a subset of the saved posts that we know a different, 
-    # so we don't have to loop through every objects comments.
-    current_posts = SavedPost.objects.all()
-    get_saved_posts(request)
-    get_top_level_comments(request)
-    new_posts = SavedPost.objects.all()
+    updated_posts = compare_saved_posts(request)
+    get_top_level_comments(request, updated_posts)
 
-    # Compare old vs new, add necessary info from new post objects to dict.
     posts_to_add = {}
-    for post in new_posts:
-        if post not in current_posts:
-            posts_to_add['post_title'] = post.post_title
-            posts_to_add['post_id'] = post.post_id
+    for post in updated_posts:
+        posts_to_add['post_title'] = post.post_title
+        posts_to_add['post_id'] = post.post_id
 
     return JsonResponse(posts_to_add)
    
