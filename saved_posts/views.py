@@ -36,11 +36,16 @@ def authenticate_api(request):
     return reddit
 
 def get_saved_posts(request):
-    """Get saved posts from the authenticated user."""
-
+    """Pulls all the saved posts from the user and returns."""
     reddit = authenticate_api(request)
-
     user_all_saved_posts = reddit.user.me().saved(limit=None)
+
+    return user_all_saved_posts
+
+def store_saved_posts(request):
+    """Sort saved posts from the authenticated user and save to DB."""
+
+    user_all_saved_posts = get_saved_posts(request)
 
     for item in user_all_saved_posts:
         try:
@@ -69,7 +74,7 @@ def compare_saved_posts(request):
     """
 
     current_posts = SavedPost.objects.all()
-    get_saved_posts(request)
+    store_saved_posts(request)
     new_posts = SavedPost.objects.all()
 
     updated_posts = []
@@ -80,7 +85,7 @@ def compare_saved_posts(request):
     return updated_posts
 
 def get_top_level_comments(request, posts):
-    """Get top level comments from each of the users saved posts."""
+    """Get top level comments from a specific set of the users' saved posts."""
 
     reddit = authenticate_api(request)
     posts = posts
@@ -124,9 +129,8 @@ class DetailView(generic.DetailView):
 
 def return_new_posts(request): 
     """
-    Compares queryset of posts - current vs updated. Adds information from new
-    posts to a dict and returns as JSON response. Also triggers comment 
-    additions for updated posts.
+    Gets new posts not currently displayed in index, triggers comments being 
+    attached, and adds post info to a dict, returning as JSON response
     """
     updated_posts = compare_saved_posts(request)
     get_top_level_comments(request, updated_posts)
